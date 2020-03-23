@@ -1,6 +1,7 @@
 async function sendtoBackend(request){
     return new Promise((resolve, reject)=>{
         chrome.runtime.sendMessage(request, result => {
+            console.log('requests:', request, 'result:',result);
             resolve(result);
         });
     });
@@ -23,6 +24,7 @@ async function getTranslation(expression){
 }
 
 async  function addNote(notedef){
+    console.log('api.js, notedef:', notedef);
     try {
         return await sendtoBackend({action:'addNote',params:{notedef}});
     } catch (err) {

@@ -5,6 +5,7 @@ class ODHBack {
 
         this.ankiconnect = new Ankiconnect();
         this.ankiweb = new Ankiweb();
+        this.storage = new SaveStorage();
         this.target = null;
 
         //setup lemmatizer
@@ -116,9 +117,10 @@ class ODHBack {
 
     // Message Hub and Handler start from here ...
     onMessage(request, sender, callback) {
+        console.log('onMessage');
         const { action, params } = request;
         const method = this['api_' + action];
-
+        console.log('action:', action, 'params: ', params, 'method:', method);
         if (typeof(method) === 'function') {
             params.callback = callback;
             method.call(this, params);
@@ -202,6 +204,7 @@ class ODHBack {
     }
 
     async api_addNote(params) {
+        console.log('backend.js api_addNote run')
         let { notedef, callback } = params;
 
         const note = this.formatNote(notedef);
@@ -227,6 +230,9 @@ class ODHBack {
                 break;
             case 'ankiweb':
                 this.target = this.ankiweb;
+                break;
+            case 'storage':
+                this.target = this.storage;
                 break;
             default:
                 this.target = null;

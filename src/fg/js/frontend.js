@@ -106,9 +106,10 @@ class ODHFront {
     }
 
     onBgMessage(request, sender, callback) {
+        console.log('onBgMessage');
         const { action, params } = request;
         const method = this['api_' + action];
-
+        console.log('action:', action, 'params: ', params, 'method:', method)
         if (typeof(method) === 'function') {
             params.callback = callback;
             method.call(this, params);
@@ -143,6 +144,7 @@ class ODHFront {
         notedef.definitions = this.notes[nindex].css + this.notes[nindex].definitions.join('<hr>');
         notedef.sentence = context;
         notedef.url = window.location.href;
+        console.log('frontend.js api_addNode, notedef:', notedef);
         let response = await addNote(notedef);
         this.popup.sendMessage('setActionState', { response, params });
     }
@@ -212,10 +214,14 @@ class ODHFront {
         let services = this.options ? this.options.services : '';
         let image = '';
         let imageclass = '';
-        if (services != 'none') {
+
+        if (services == 'storage') {
+            image = 'plus.png';
+            imageclass = 'class="odh-addnote"';
+        } else if (services != 'none') {
             image = (services == 'ankiconnect') ? 'plus.png' : 'cloud.png';
             imageclass = await isConnected() ? 'class="odh-addnote"' : 'class="odh-addnote-disabled"';
-        }
+        } 
 
         for (const [nindex, note] of notes.entries()) {
             content += note.css + '<div class="odh-note">';
@@ -259,7 +265,12 @@ class ODHFront {
     popupFooter() {
         let root = chrome.runtime.getURL('/');
         let services = this.options ? this.options.services : '';
-        let image = (services == 'ankiconnect') ? 'plus.png' : 'cloud.png';
+        let image = '';
+        if (services == 'storage') {
+            image = 'plus.png';
+        } else if (services != 'none') {
+            image = (services == 'ankiconnect') ? 'plus.png' : 'cloud.png';
+        }
         let button = chrome.runtime.getURL('fg/img/' + image);
         let monolingual = this.options ? (this.options.monolingual == '1' ? 1 : 0) : 0;
 
